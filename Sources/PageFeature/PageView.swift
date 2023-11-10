@@ -20,59 +20,75 @@ public struct PageView: View {
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       GeometryReader { proxy in
-        ScrollView {
-          Image("matfey", bundle: .module)
-            .resizable()
-            .interpolation(.medium)
-            .aspectRatio(contentMode: .fill)
-            .frame(width: proxy.width, height: proxy.height / 3, alignment: .top)
-            .clipped(antialiased: true)
-            .overlay {
-              WhiteOverlay(model: .init(title: viewStore.chapter?.description ?? "", subtitle: viewStore.book?.name ?? ""))
+        if !viewStore.paragraphs.isEmpty {
+          ScrollView {
+            Image("matfey", bundle: .module)
+              .resizable()
+              .interpolation(.medium)
+              .aspectRatio(contentMode: .fill)
+              .frame(width: proxy.width, height: proxy.height / 3, alignment: .top)
+              .clipped(antialiased: true)
+              .overlay {
+                WhiteOverlay(model: .init(title: viewStore.chapter?.description ?? "", subtitle: viewStore.book?.name ?? ""))
+              }
+            VStack(alignment: .leading, spacing: 20) {
+              ForEach(viewStore.paragraphs, id: \.self) { paragraph in
+                Menu {
+                  Button("Показать толкование", action: {})
+                  Button("Сохранить в заметки", action: {})
+                } label: {
+                  Text(verbatim: paragraph.description)
+                    .multilineTextAlignment(.leading)
+                    .font(.system(.body))
+                    .padding(.leading, 10)
+                    .padding(.trailing, 10)
+                }
+                .foregroundColor(.black)
+              }
+              .minimumScaleFactor(0.1)
             }
+            .background(.white)
+            .padding(.leading, 10)
+            .padding(.trailing, 10)
 
-          VStack(alignment: .leading, spacing: 20) {
-            ForEach(viewStore.paragraphs, id: \.self) { paragraph in
-              Menu {
-                Button("Показать толкование", action: {})
-                Button("Сохранить в заметки", action: {})
-              } label: {
-                Text(verbatim: paragraph.description)
-                  .multilineTextAlignment(.leading)
-                  .font(.system(.body))
-                  .padding(.leading, 10)
-                  .padding(.trailing, 10)
-              }
-              .foregroundColor(.black)
+            HStack {
+              Image(systemName: "arrow.left.circle")
+                .font(.system(size: 60))
+                .onTapGesture {
+                  viewStore.send(.previousPage)
+                }
+              Image(systemName: "arrow.right.circle")
+                .font(.system(size: 60))
+                .onTapGesture {
+                  viewStore.send(.nextPage)
+                }
             }
-            .minimumScaleFactor(0.1)
           }
-          .background(.white)
-          .padding(.leading, 10)
-          .padding(.trailing, 10)
-
-          HStack {
-            Image(systemName: "arrow.left.circle")
-              .font(.system(size: 60))
-              .onTapGesture {
-                viewStore.send(.previousPage)
+          .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
+            .onEnded { value in
+              print(value.translation)
+              switch (value.translation.width, value.translation.height) {
+              case (...0, -30...30): viewStore.send(.nextPage)
+              case (0..., -30...30): viewStore.send(.previousPage)
+              default: break
               }
-            Image(systemName: "arrow.right.circle")
-              .font(.system(size: 60))
-              .onTapGesture {
-                viewStore.send(.nextPage)
-              }
+            }
+          )
+        } else {
+          Centralized {
+            ProgressView()
+              .scaleEffect(3.2)
           }
-
+          .onAppear {
+            viewStore.send(.loadPage(at: 1))
+          }
         }
       }
-      .onAppear {
-        viewStore.send(.loadPage(at: 1))
-      }
+      .edgesIgnoringSafeArea(.top)
     }
-    .edgesIgnoringSafeArea(.top)
   }
 }
+
 
 struct PageView_Preview: PreviewProvider {
   static var previews: some View {
