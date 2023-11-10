@@ -8,7 +8,7 @@ let package = Package(
   platforms: [.iOS(.v16), .macOS(.v11)],
   products: [
     .library(name: "BiblePackage", targets: ["BiblePackage"]),
-//    .library(name: "PageFeature", targets: ["PageFeature"]),
+    .library(name: "PageFeature", targets: ["PageFeature"]),
     .library(name: "Extensions+GenericViews", targets: ["Extensions+GenericViews"]),
     .library(name: "HomeFeature", targets: ["HomeFeature"]),
   ],
@@ -18,11 +18,11 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
   ],
   targets: [
-    .executableTarget(name: "ParserClient", dependencies: [
+    .target(name: "ParserClient", dependencies: [
       "Helpers",
       .product(name: "Parsing", package: "swift-parsing"),
-    ],
-    resources: [
+      .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+    ], resources: [
       .process("Resources"),
     ]),
     .target(name: "BiblePackage", dependencies: [
@@ -40,8 +40,9 @@ let package = Package(
     .target(
       name: "PageFeature",
       dependencies: [
-        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        "ParserClient",
         "Extensions+GenericViews",
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ]),
     .target(name: "Extensions+GenericViews", dependencies: []),
     .testTarget(name: "BiblePackageTests", dependencies: ["BiblePackage"]),

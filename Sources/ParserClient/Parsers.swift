@@ -86,13 +86,6 @@ struct ContinuePageParser: Parser {
   }
 }
 
-typealias PageInfo = (Book, Chapter, [Paragraph])
-typealias ContinuousPageInfo = (String?, [Paragraph], Chapter, [Paragraph])
-
-enum Page {
-  case start(PageInfo)
-  case continious(ContinuousPageInfo)
-}
 
 struct PageParser: Parser {
   var body: some Parser<Substring.UTF8View, Page> {
@@ -103,12 +96,3 @@ struct PageParser: Parser {
   }
 }
 
-let manager = BibleManager()
-manager.loadPage.send(3)
-
-let cancel = manager.$shownParagraphs
-  .sink {
-    Printer.prettyPrint($0)
-  }
-
-Thread.sleep(forTimeInterval: 100_000_000)

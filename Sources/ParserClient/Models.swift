@@ -7,16 +7,33 @@
 
 import Foundation
 
-struct Book: Encodable, Equatable {
-  let name: String
+public struct Book: Encodable, Equatable {
+  public let name: String
 }
 
-struct Chapter: Encodable, Equatable {
-  let name: String
-  let number: Int
+public struct Chapter: Encodable, Equatable, CustomStringConvertible {
+  public let name: String
+  public let number: Int
+  
+  public var description: String {
+    "\(name) \(number)"
+  }
 }
 
-struct Paragraph: Encodable, Equatable {
-  let number: Int
-  var text: String
+public struct Paragraph: Encodable, Hashable, CustomStringConvertible {
+  public let number: Int
+  public var text: String
+  
+  public var description: String {
+    "\(number) \(text)"
+  }
 }
+
+public enum Page {
+  case start(PageInfo)
+  case continious(ContinuousPageInfo)
+}
+
+
+public typealias PageInfo = (Book, Chapter, [Paragraph])
+public typealias ContinuousPageInfo = (String?, [Paragraph], Chapter, [Paragraph])

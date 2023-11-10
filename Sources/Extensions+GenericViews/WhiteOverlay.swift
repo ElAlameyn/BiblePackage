@@ -12,9 +12,9 @@ public struct WhiteOverlay: View {
     var title: String
     var subtitle: String
 
-    public init(title: String, subtitle: String) {
-      self.title = title
-      self.subtitle = subtitle
+    public init(title: String?, subtitle: String) {
+      self.title = title ?? ""
+      self.subtitle = subtitle ?? ""
     }
   }
 

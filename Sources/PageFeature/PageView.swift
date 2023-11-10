@@ -6,54 +6,78 @@
 //
 
 import ComposableArchitecture
-import SwiftUI
 import Extensions_GenericViews
+import SwiftUI
 
 public struct PageView: View {
-  public init() {
+  let store: StoreOf<PageFeature>
+
+  public init(store: StoreOf<PageFeature>) {
+    self.store = store
     UINavigationBar.appearance().tintColor = .white
   }
 
   public var body: some View {
-    GeometryReader { proxy in
-      ScrollView {
-        Image("matfey", bundle: .module)
-          .resizable()
-          .interpolation(.medium)
-          .aspectRatio(contentMode: .fill)
-          .frame(width: proxy.width, height: proxy.height / 3, alignment: .top)
-          .clipped(antialiased: true)
-          .overlay {
-            WhiteOverlay(model: .init(title: "Глава 1", subtitle: "Евангелие от Матфея"))
+    WithViewStore(store, observe: { $0 }) { viewStore in
+      GeometryReader { proxy in
+        ScrollView {
+          Image("matfey", bundle: .module)
+            .resizable()
+            .interpolation(.medium)
+            .aspectRatio(contentMode: .fill)
+            .frame(width: proxy.width, height: proxy.height / 3, alignment: .top)
+            .clipped(antialiased: true)
+            .overlay {
+              WhiteOverlay(model: .init(title: viewStore.chapter?.description ?? "", subtitle: viewStore.book?.name ?? ""))
+            }
+
+          VStack(alignment: .leading, spacing: 20) {
+            ForEach(viewStore.paragraphs, id: \.self) { paragraph in
+              Menu {
+                Button("Показать толкование", action: {})
+                Button("Сохранить в заметки", action: {})
+              } label: {
+                Text(verbatim: paragraph.description)
+                  .multilineTextAlignment(.leading)
+                  .font(.system(.body))
+                  .padding(.leading, 10)
+                  .padding(.trailing, 10)
+              }
+              .foregroundColor(.black)
+            }
+            .minimumScaleFactor(0.1)
+          }
+          .background(.white)
+          .padding(.leading, 10)
+          .padding(.trailing, 10)
+
+          HStack {
+            Image(systemName: "arrow.left.circle")
+              .font(.system(size: 60))
+              .onTapGesture {
+                viewStore.send(.previousPage)
+              }
+            Image(systemName: "arrow.right.circle")
+              .font(.system(size: 60))
+              .onTapGesture {
+                viewStore.send(.nextPage)
+              }
           }
 
-        VStack(spacing: 20) {
-          ForEach(0 ... 5, id: \.self) { _ in
-            Menu {
-              Button("Показать толкование", action: {})
-              Button("Сохранить в заметки", action: {})
-            } label: {
-              Text(verbatim: .loremIpsum5)
-                .multilineTextAlignment(.leading)
-                .font(.system(.body))
-                .padding(.leading, 10)
-                .padding(.trailing, 10)
-            }
-            .foregroundColor(.black)
-          }
-          .minimumScaleFactor(0.1)
         }
-        .background(.white)
+      }
+      .onAppear {
+        viewStore.send(.loadPage(at: 1))
       }
     }
     .edgesIgnoringSafeArea(.top)
   }
 }
 
-
 struct PageView_Preview: PreviewProvider {
   static var previews: some View {
-    PageView()
+    PageView(store: .init(initialState: .init(), reducer: {
+      PageFeature()
+    }))
   }
 }
-

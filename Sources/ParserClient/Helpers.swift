@@ -18,12 +18,3 @@ extension UTF8.CodeUnit {
     self == .init(ascii: " ")
   }
 }
-
-extension Publisher {
-  func printThread() -> AnyPublisher<Output, Failure> {
-    self.handleEvents(receiveOutput: { _ in
-      Swift.print("Current Thread: \(Thread.current)")
-    })
-    .eraseToAnyPublisher()
-  }
-}
