@@ -5,16 +5,27 @@
 //
 
 import ComposableArchitecture
-import SwiftUI
 import Extensions_GenericViews
+import SwiftUI
 
+struct Appearance {
+  static func whiteBoldTitleTextStyle() {
+    UIBarButtonItem.appearance()
+      .setTitleTextAttributes([
+        .foregroundColor: UIColor.white.withAlphaComponent(0.9),
+      ], for: .normal)
 
+    UIBarButtonItem.appearance().tintColor = UIColor.white.withAlphaComponent(0.9)
+  }
+
+}
 
 public struct HomeView: View {
   let store: StoreOf<HomeFeature>
 
   public init(store: StoreOf<HomeFeature>) {
     self.store = store
+    Appearance.whiteBoldTitleTextStyle()
   }
 
   public var body: some View {
@@ -27,9 +38,10 @@ public struct HomeView: View {
 
           VStack {
             NavigationLink {
-              PageVC(pages: [
-                ChapterPage()
-              ])
+//              PageVC(pages: [
+//                PageView()
+//              ])
+//              .ignoresSafeArea()
             } label: {
               Image("bible", bundle: .module)
                 .homeScreenDefaultPrayersConfiguration(
@@ -67,55 +79,14 @@ public struct HomeView: View {
           .navigationTitle("Библия")
         }
       }
+      .tint(.black)
     }
   }
 }
-
-struct ChapterPage: View {
-  var body: some View {
-    GeometryReader { proxy in
-      VStack {
-        Image("matfey", bundle: .module)
-          .resizable()
-          .interpolation(.medium)
-          .aspectRatio(contentMode: .fill)
-          .frame(width: proxy.width, height: proxy.height / 3, alignment: .top)
-          .clipped(antialiased: true)
-          .overlay {
-            WhiteOverlay(model: .init(title: "Глава 1", subtitle: "Евангелие от Матфея"))
-          }
-
-        VStack(spacing: 20) {
-          ForEach(0 ... 5, id: \.self) { _ in
-            Menu {
-              Button("Показать толкование", action: {})
-              Button("Сохранить в заметки", action: {})
-            } label: {
-              Text(verbatim: .loremIpsum5)
-                .multilineTextAlignment(.leading)
-                .font(.system(.body))
-                .padding(.leading, 10)
-                .padding(.trailing, 10)
-            }
-            .foregroundColor(.black)
-          }
-          .minimumScaleFactor(0.1)
-        }
-        .background(.white)
-      }
-    }
-    .edgesIgnoringSafeArea(.top)
-  }
-}
-
 
 struct HomeView_Previews: PreviewProvider {
   static var previews: some View {
-//    HomeView(store: .init(initialState: .init(), reducer: { HomeFeature() }))
-    PageVC(pages: [
-      ChapterPage()
-    ])
-    .edgesIgnoringSafeArea(.top)
+    HomeView(store: .init(initialState: .init(), reducer: { HomeFeature() }))
   }
 }
 

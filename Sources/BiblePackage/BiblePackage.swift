@@ -1,15 +1,30 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Артем Калинкин on 17.08.2023.
 //
 
-import HomeFeature
+import SwiftUI
+//import Firebase
+//import FirebaseFirestore
 
 
-public struct BiblePackage {
-  let a = 120
-  let b = 10
-  public init() {}
+struct FirestoreTestView: View {
+
+//  var db = FirestoreApp
+
+  init() {
+//    FirebaseApp.configure()
+  }
+
+  var body: some View {
+    Text("Hello world")
+  }
+}
+
+struct Firestore_Previews: PreviewProvider {
+  static var previews: some View {
+    FirestoreTestView()
+  }
 }

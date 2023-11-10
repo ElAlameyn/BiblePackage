@@ -8,13 +8,23 @@
 import SwiftUI
 
 public struct WhiteOverlay: View {
-  struct Model {
+  public struct Model {
     var title: String
     var subtitle: String
+
+    public init(title: String, subtitle: String) {
+      self.title = title
+      self.subtitle = subtitle
+    }
   }
 
   var model: Model
   var isCornerRadiusEnabled = false
+
+  public init(model: Model, isCornerRadiusEnabled: Bool = false) {
+    self.model = model
+    self.isCornerRadiusEnabled = isCornerRadiusEnabled
+  }
 
   public var body: some View {
     GeometryReader { proxy in

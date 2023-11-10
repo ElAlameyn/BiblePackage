@@ -14,15 +14,35 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>CoreBibleFeature.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 		<key>Extensions+GenericViews.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>6</integer>
 		</dict>
 		<key>HomeFeature.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>2</integer>
+		</dict>
+		<key>PageFeature.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>ParserClient.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>ParserClientTests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
@@ -38,6 +58,21 @@
 			<true/>
 		</dict>
 		<key>HomeFeature</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>PageFeature</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>ParserClient</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>ParserClientTests</key>
 		<dict>
 			<key>primary</key>
 			<true/>
