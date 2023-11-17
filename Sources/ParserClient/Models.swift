@@ -34,6 +34,16 @@ public enum Page {
   case continious(ContinuousPageInfo)
 }
 
+public struct PageInfo {
+  public var bibleBookName: Book
+  public var chapter: Chapter
+  public var paragraphs: [Paragraph]
+}
 
-public typealias PageInfo = (Book, Chapter, [Paragraph])
-public typealias ContinuousPageInfo = (String?, [Paragraph], Chapter, [Paragraph])
+public struct ContinuousPageInfo {
+  public var extraParagraph: String?
+  public var previousChapterParagraphs: [Paragraph]
+  public var currentChapter: Chapter
+  public var currentChapterParagraphs: [Paragraph]
+}
+

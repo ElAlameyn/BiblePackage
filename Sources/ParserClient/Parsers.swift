@@ -10,7 +10,6 @@ import Helpers
 import Parsing
 import PDFKit
 
-
 struct ParagraphParser: Parser {
   var body: some Parser<Substring.UTF8View, Paragraph> {
     Parse(Paragraph.init(number:text:)) {
@@ -49,16 +48,18 @@ struct ChapterParser: Parser {
 
 struct BookPageParser: Parser {
   var body: some Parser<Substring.UTF8View, PageInfo> {
-    Whitespace()
-    // TODO: Add conformacne to all books
-    Parse(Book.init(name:)) {
-      PrefixUpTo("\n".utf8).map(.string)
-      "\n".utf8
+    Parse(PageInfo.init(bibleBookName:chapter:paragraphs:)) {
+      Whitespace()
+      // TODO: Add conformacne to all books
+      Parse(Book.init(name:)) {
+        PrefixUpTo("\n".utf8).map(.string)
+        "\n".utf8
+      }
+      Whitespace()
+      ChapterParser()
+      Whitespace()
+      ManyParagraphsParser()
     }
-    Whitespace()
-    ChapterParser()
-    Whitespace()
-    ManyParagraphsParser()
   }
 }
 
@@ -73,19 +74,20 @@ struct FirstLineParser: Parser {
 
 struct ContinuePageParser: Parser {
   var body: some Parser<Substring.UTF8View, ContinuousPageInfo> {
-    PrefixUpTo("Глава".utf8).pipe {
-      Optionally {
-        Backtracking {
-          FirstLineParser()
+    Parse(ContinuousPageInfo.init(extraParagraph:previousChapterParagraphs:currentChapter:currentChapterParagraphs:)) {
+      PrefixUpTo("Глава".utf8).pipe {
+        Optionally {
+          Backtracking {
+            FirstLineParser()
+          }
         }
+        ManyParagraphsParser()
       }
+      ChapterParser()
       ManyParagraphsParser()
     }
-    ChapterParser()
-    ManyParagraphsParser()
   }
 }
-
 
 struct PageParser: Parser {
   var body: some Parser<Substring.UTF8View, Page> {
@@ -95,4 +97,3 @@ struct PageParser: Parser {
     }
   }
 }
-

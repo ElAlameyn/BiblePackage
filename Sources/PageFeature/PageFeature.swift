@@ -10,7 +10,8 @@ import ParserClient
 import PDFKit
 
 public struct PageFeature: Reducer {
-  public init() {}
+  public init() {
+  }
 
   public struct State: Equatable {
     var pageNumber: Int = 0
@@ -51,23 +52,23 @@ public struct PageFeature: Reducer {
         }
       case .parsingResult(.success(let page)):
         switch page {
-        case .start((let book, let chapter, let paragraphs)):
-          state.book = book
-          state.chapter = chapter
-          state.paragraphs += paragraphs
+        case .start(let startPageInfo):
+          state.book = startPageInfo.bibleBookName
+          state.chapter = startPageInfo.chapter
+          state.paragraphs += startPageInfo.paragraphs
           state.loadingState = .additionalLoading
           return .run { [number = state.pageNumber] send in
             await send(.loadPage(at: number + 1))
           }
-        case .continious((let extra, let previousParagraphs, let currentChapter, let currentParagraph)):
+        case .continious(let continuousPageInfo):
           switch state.loadingState {
           case .additionalLoading:
-            state.paragraphs[state.paragraphs.endIndex - 1].text += " " + (extra ?? "")
-            state.paragraphs += previousParagraphs
+            state.paragraphs[state.paragraphs.endIndex - 1].text += " " + (continuousPageInfo.extraParagraph ?? "")
+            state.paragraphs += continuousPageInfo.currentChapterParagraphs
             state.loadingState = .nextPage
           case .nextPage, .none:
-            state.chapter = currentChapter
-            state.paragraphs = currentParagraph
+            state.chapter = continuousPageInfo.currentChapter
+            state.paragraphs = continuousPageInfo.currentChapterParagraphs
             state.loadingState = .additionalLoading
             return .run { [number = state.pageNumber] send in
               await send(.loadPage(at: number + 1))
@@ -91,3 +92,5 @@ public struct PageFeature: Reducer {
     state.paragraphs.removeAll()
   }
 }
+
+
