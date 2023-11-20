@@ -9,8 +9,11 @@ import ComposableArchitecture
 import Extensions_GenericViews
 import SwiftUI
 
+
+
 public struct PageView: View {
   let store: StoreOf<PageFeature>
+  @State var isScrolling = false
 
   public init(store: StoreOf<PageFeature>) {
     self.store = store
@@ -43,11 +46,17 @@ public struct PageView: View {
                     .padding(.leading, 10)
                     .padding(.trailing, 10)
                 }
+//                .allowsHitTesting(!viewStore.isScrolling)
                 .foregroundColor(.black)
               }
               .minimumScaleFactor(0.1)
             }
-            .background(.white)
+            .background(GeometryReader(content: { geometry in
+              Color.clear.preference(key: ScrollReducer.OffsetKey.self, value: geometry.frame(in: .global).origin.y)
+            }))
+            .onPreferenceChange(ScrollReducer.OffsetKey.self) { value in
+              viewStore.send(.scrollAction(.scrolling(value)))
+            }
             .padding(.leading, 10)
             .padding(.trailing, 10)
 
@@ -64,16 +73,19 @@ public struct PageView: View {
                 }
             }
           }
-          .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
-            .onEnded { value in
-              print(value.translation)
-              switch (value.translation.width, value.translation.height) {
-              case (...0, -30...30): viewStore.send(.nextPage)
-              case (0..., -30...30): viewStore.send(.previousPage)
-              default: break
-              }
-            }
-          )
+          // TODO: Make UISwipeGesture()
+          // TODO: Make LongPressGesture for Menu
+          
+//          .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
+//            .onEnded { value in
+//              print(value.translation)
+//              switch (value.translation.width, value.translation.height) {
+//              case (...0, -30...30): viewStore.send(.nextPage)
+//              case (0..., -30...30): viewStore.send(.previousPage)
+//              default: break
+//              }
+//            }
+//          )
         } else {
           Centralized {
             ProgressView()
@@ -89,11 +101,10 @@ public struct PageView: View {
   }
 }
 
-
 struct PageView_Preview: PreviewProvider {
   static var previews: some View {
     PageView(store: .init(initialState: .init(), reducer: {
-      PageFeature()
+      TestPageFeature()
     }))
   }
 }

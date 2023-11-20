@@ -10,8 +10,7 @@ import ParserClient
 import PDFKit
 
 public struct PageFeature: Reducer {
-  public init() {
-  }
+  public init() {}
 
   public struct State: Equatable {
     var pageNumber: Int = 0
@@ -19,6 +18,7 @@ public struct PageFeature: Reducer {
     var book: Book?
     var paragraphs = [Paragraph]()
     var loadingState: LoadingPageState = .none
+    var scrollState: ScrollReducer.State = .init()
 
     public init() {}
   }
@@ -36,9 +36,15 @@ public struct PageFeature: Reducer {
     case nextPage
     case previousPage
     case parsingResult(TaskResult<Page>)
+    case scrollAction(ScrollReducer.Action)
   }
-
+  
+  
   public var body: some Reducer<State, Action> {
+    Scope(state: \.scrollState, action: /Action.scrollAction) {
+      ScrollReducer()
+    }
+    
     Reduce { state, action in
       switch action {
       case .loadPage(at: let number):
@@ -47,7 +53,7 @@ public struct PageFeature: Reducer {
 
         return .run { send in
           await send(.parsingResult(TaskResult {
-            try parseClient.loadPage(number)
+            try parseClient.parsePage(number)
           }))
         }
       case .parsingResult(.success(let page)):
@@ -81,10 +87,12 @@ public struct PageFeature: Reducer {
       case .nextPage:
         return .send(.loadPage(at: state.pageNumber))
       case .previousPage:
-        return state.pageNumber > 2 ? .send(.loadPage(at: state.pageNumber-2)) : .none
+        return state.pageNumber > 2 ? .send(.loadPage(at: state.pageNumber - 2)) : .none
+      case .scrollAction(_): break
       }
       return .none
     }
+//    ._printChanges()
   }
 
   private func clear(state: inout State) {
@@ -92,5 +100,4 @@ public struct PageFeature: Reducer {
     state.paragraphs.removeAll()
   }
 }
-
 
