@@ -20,13 +20,20 @@ public struct Chapter: Encodable, Equatable, CustomStringConvertible {
   }
 }
 
-public struct Paragraph: Encodable, Hashable, CustomStringConvertible {
+public struct Paragraph: Encodable, Hashable, CustomStringConvertible, Identifiable {
+  
   public let number: Int
   public var text: String
+  
+  public init(number: Int, text: String) {
+    self.number = number
+    self.text = text
+  }
   
   public var description: String {
     "\(number) \(text)"
   }
+  public var id: Int { number }
 }
 
 public enum Page {

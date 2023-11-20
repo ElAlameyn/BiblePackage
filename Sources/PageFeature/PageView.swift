@@ -10,7 +10,6 @@ import Extensions_GenericViews
 import SwiftUI
 
 
-
 public struct PageView: View {
   let store: StoreOf<PageFeature>
   @State var isScrolling = false
@@ -34,21 +33,12 @@ public struct PageView: View {
               .overlay {
                 WhiteOverlay(model: .init(title: viewStore.chapter?.description ?? "", subtitle: viewStore.book?.name ?? ""))
               }
+
             VStack(alignment: .leading, spacing: 20) {
-              ForEach(viewStore.paragraphs, id: \.self) { paragraph in
-                Menu {
-                  Button("Показать толкование", action: {})
-                  Button("Сохранить в заметки", action: {})
-                } label: {
-                  Text(verbatim: paragraph.description)
-                    .multilineTextAlignment(.leading)
-                    .font(.system(.body))
-                    .padding(.leading, 10)
-                    .padding(.trailing, 10)
-                }
-//                .allowsHitTesting(!viewStore.isScrolling)
-                .foregroundColor(.black)
-              }
+              ForEachStore(
+                store.scope(state: \.paragraphs, action: PageFeature.Action.paragraphAction),
+                content: ParagraphView.init(store:)
+              )
               .minimumScaleFactor(0.1)
             }
             .background(GeometryReader(content: { geometry in
@@ -61,13 +51,15 @@ public struct PageView: View {
             .padding(.trailing, 10)
 
             HStack {
-              Image(systemName: "arrow.left.circle")
+              Image(systemName: "arrow.left")
                 .font(.system(size: 60))
+                .tint(Color(uiColor: .lightGray))
                 .onTapGesture {
                   viewStore.send(.previousPage)
                 }
-              Image(systemName: "arrow.right.circle")
+              Image(systemName: "arrow.right")
                 .font(.system(size: 60))
+                .tint(Color(uiColor: .lightGray))
                 .onTapGesture {
                   viewStore.send(.nextPage)
                 }
@@ -75,7 +67,7 @@ public struct PageView: View {
           }
           // TODO: Make UISwipeGesture()
           // TODO: Make LongPressGesture for Menu
-          
+
 //          .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
 //            .onEnded { value in
 //              print(value.translation)

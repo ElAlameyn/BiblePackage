@@ -16,7 +16,7 @@ public struct PageFeature: Reducer {
     var pageNumber: Int = 0
     var chapter: Chapter?
     var book: Book?
-    var paragraphs = [Paragraph]()
+    var paragraphs = IdentifiedArrayOf<Paragraph>()
     var loadingState: LoadingPageState = .none
     var scrollState: ScrollReducer.State = .init()
 
@@ -37,6 +37,7 @@ public struct PageFeature: Reducer {
     case previousPage
     case parsingResult(TaskResult<Page>)
     case scrollAction(ScrollReducer.Action)
+    case paragraphAction(Int,ParagraphFeature.Action)
   }
   
   
@@ -74,7 +75,8 @@ public struct PageFeature: Reducer {
             state.loadingState = .nextPage
           case .nextPage, .none:
             state.chapter = continuousPageInfo.currentChapter
-            state.paragraphs = continuousPageInfo.currentChapterParagraphs
+            state.paragraphs = IdentifiedArray(uniqueElements: continuousPageInfo.currentChapterParagraphs)
+            
             state.loadingState = .additionalLoading
             return .run { [number = state.pageNumber] send in
               await send(.loadPage(at: number + 1))
@@ -89,12 +91,17 @@ public struct PageFeature: Reducer {
       case .previousPage:
         return state.pageNumber > 2 ? .send(.loadPage(at: state.pageNumber - 2)) : .none
       case .scrollAction(_): break
+      case .paragraphAction(_): break
       }
       return .none
+    }
+    .forEach(\.paragraphs, action: /Action.paragraphAction) {
+      ParagraphFeature()
     }
 //    ._printChanges()
   }
 
+  //TODO: Make with Overture
   private func clear(state: inout State) {
     state.chapter = nil
     state.paragraphs.removeAll()
