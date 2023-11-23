@@ -12,7 +12,7 @@ import ParserClient
 public struct ParagraphFeature: Reducer {
   public typealias State = Paragraph
   
-  public enum Action {
+  public enum Action: Hashable {
     case saveToNotes
     case showReferences
   }

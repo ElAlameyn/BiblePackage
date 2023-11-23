@@ -9,18 +9,22 @@ import ComposableArchitecture
 import Extensions_GenericViews
 import SwiftUI
 
-
 public struct PageView: View {
   let store: StoreOf<PageFeature>
+  @ObservedObject var viewStore: ViewStoreOf<PageFeature>
   @State var isScrolling = false
+  private let action: PageFeature.Action
+  @State var isPresented = false
 
-  public init(store: StoreOf<PageFeature>) {
+  @MainActor public init(store: StoreOf<PageFeature>, action: PageFeature.Action = .loadPage(at: 1)) {
     self.store = store
+    self.viewStore = ViewStore(store, observe: { $0 })
+    self.action = action
     UINavigationBar.appearance().tintColor = .white
   }
 
   public var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
+    ScrollViewReader { scrolling in
       GeometryReader { proxy in
         if !viewStore.paragraphs.isEmpty {
           ScrollView {
@@ -31,8 +35,12 @@ public struct PageView: View {
               .frame(width: proxy.width, height: proxy.height / 3, alignment: .top)
               .clipped(antialiased: true)
               .overlay {
-                WhiteOverlay(model: .init(title: viewStore.chapter?.description ?? "", subtitle: viewStore.book?.name ?? ""))
+                WhiteOverlay(model: .init(
+                  title: viewStore.chapter?.description ?? "",
+                  subtitle: viewStore.book?.name ?? ""
+                ))
               }
+              .id(1)
 
             VStack(alignment: .leading, spacing: 20) {
               ForEachStore(
@@ -50,46 +58,53 @@ public struct PageView: View {
             .padding(.leading, 10)
             .padding(.trailing, 10)
 
+
             HStack {
+
+
               Image(systemName: "arrow.left")
-                .font(.system(size: 60))
-                .tint(Color(uiColor: .lightGray))
+                .font(.system(size: 40))
+                .foregroundStyle(.gray)
                 .onTapGesture {
                   viewStore.send(.previousPage)
                 }
+
+              Spacer()
+              Image(systemName: "arrow.up")
+                .font(.system(size: 40))
+                .foregroundStyle(.gray)
+                .onTapGesture {
+                  withAnimation {
+                    scrolling.scrollTo(1)
+                  }
+                }
+
+              Spacer()
+
+
               Image(systemName: "arrow.right")
-                .font(.system(size: 60))
-                .tint(Color(uiColor: .lightGray))
+                .font(.system(size: 40))
+                .foregroundStyle(.gray)
                 .onTapGesture {
                   viewStore.send(.nextPage)
                 }
             }
+            .padding()
           }
-          // TODO: Make UISwipeGesture()
-          // TODO: Make LongPressGesture for Menu
-
-//          .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
-//            .onEnded { value in
-//              print(value.translation)
-//              switch (value.translation.width, value.translation.height) {
-//              case (...0, -30...30): viewStore.send(.nextPage)
-//              case (0..., -30...30): viewStore.send(.previousPage)
-//              default: break
-//              }
-//            }
-//          )
         } else {
           Centralized {
             ProgressView()
               .scaleEffect(3.2)
           }
-          .onAppear {
-            viewStore.send(.loadPage(at: 1))
-          }
         }
       }
       .edgesIgnoringSafeArea(.top)
     }
+    .transition(.slide)
+    .onLoad {
+      viewStore.send(action)
+    }
+    .overlay(isPresented ? EmptyView().transition(.move(edge: .leading)) : nil)
   }
 }
 
@@ -97,6 +112,25 @@ struct PageView_Preview: PreviewProvider {
   static var previews: some View {
     PageView(store: .init(initialState: .init(), reducer: {
       TestPageFeature()
+        .dependency(\.parseClient, .singleValue)
     }))
   }
 }
+
+// MARK: - Maybe later
+
+//                NavigationLink {
+//                  PageView(store: self.store, action: .nextPage)
+//                } label: {
+//                                  Image(systemName: "arrow.right")
+//                                    .font(.system(size: 40))
+//                                    .foregroundStyle(.gray)
+//                }
+
+//              NavigationLink {
+//                PageView(store: self.store, action: .previousPage)
+//              } label: {
+//                Image(systemName: "arrow.left")
+//                  .font(.system(size: 40))
+//                  .foregroundStyle(.gray)
+//              }

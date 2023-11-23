@@ -28,6 +28,8 @@ public struct HomeView: View {
     Appearance.whiteBoldTitleTextStyle()
   }
 
+  // TODO: Add morning & evening rule
+  // TODO: Think about loading info from server
   public var body: some View {
     WithViewStore(store, observe: { $0 }) { _ in
       NavigationStack {
@@ -90,8 +92,4 @@ struct HomeView_Previews: PreviewProvider {
   }
 }
 
-extension String {
-  static let loremIpsum5 = """
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-  """
-}
+

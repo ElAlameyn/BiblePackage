@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Extensions_GenericViews
 import Foundation
 import PDFKit
 
@@ -40,11 +41,21 @@ extension ParseClient: DependencyKey {
 
   public static var testValue = ParseClient { _ in
     let test = (0 ... 12).map {
-      Paragraph(number: $0, text: """
-            Veniam non excepteur consectetur sit velit adipisicing irure sit velit officia laboris incididunt sint ipsum cupidatat. Proident commodo culpa aliqua elit eu officia voluptate esse exercitation. Consequat deserunt eiusmod duis incididunt ullamco. Proident laboris pariatur consectetur incididunt magna consectetur ipsum excepteur sint magna ea. Et excepteur Lorem ex. Laboris anim aliquip reprehenderit est ad ea esse ex cupidatat.
-      """)
+      Paragraph(number: $0, text: String.loremIpsum5)
     }
+    return .start(.init(
+      bibleBookName: Book(name: "Бытие"),
+      chapter: Chapter(name: "Глава", number: 1),
+      paragraphs: test))
+  }
 
-    return .start(.init(bibleBookName: Book(name: "Бытие"), chapter: Chapter(name: "Глава", number: 1), paragraphs: test))
+  public static var singleValue = ParseClient { _ in
+    let test = (0 ... 3).map {
+      Paragraph(number: $0, text: String.loremIpsum5)
+    }
+    return .start(.init(
+      bibleBookName: Book(name: "Бытие"),
+      chapter: Chapter(name: "Глава", number: 1),
+      paragraphs: test))
   }
 }

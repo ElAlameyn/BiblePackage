@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Overture
 import ParserClient
 import PDFKit
 
@@ -31,26 +32,25 @@ public struct PageFeature: Reducer {
 
   @Dependency(\.parseClient) var parseClient
 
-  public enum Action {
+  public enum Action: Hashable {
     case loadPage(at: Int)
     case nextPage
     case previousPage
     case parsingResult(TaskResult<Page>)
     case scrollAction(ScrollReducer.Action)
-    case paragraphAction(Int,ParagraphFeature.Action)
+    case paragraphAction(Int, ParagraphFeature.Action)
   }
-  
-  
+
   public var body: some Reducer<State, Action> {
     Scope(state: \.scrollState, action: /Action.scrollAction) {
       ScrollReducer()
     }
-    
+
     Reduce { state, action in
       switch action {
       case .loadPage(at: let number):
         state.pageNumber = number
-        if state.loadingState != .additionalLoading { clear(state: &state) }
+        if state.loadingState != .additionalLoading { clear(&state) }
 
         return .run { send in
           await send(.parsingResult(TaskResult {
@@ -71,13 +71,13 @@ public struct PageFeature: Reducer {
           switch state.loadingState {
           case .additionalLoading:
             state.paragraphs[state.paragraphs.endIndex - 1].text += " " + (continuousPageInfo.extraParagraph ?? "")
-            state.paragraphs += continuousPageInfo.currentChapterParagraphs
+            state.paragraphs += continuousPageInfo.previousChapterParagraphs
             state.loadingState = .nextPage
           case .nextPage, .none:
             state.chapter = continuousPageInfo.currentChapter
             state.paragraphs = IdentifiedArray(uniqueElements: continuousPageInfo.currentChapterParagraphs)
-            
             state.loadingState = .additionalLoading
+            
             return .run { [number = state.pageNumber] send in
               await send(.loadPage(at: number + 1))
             }
@@ -90,21 +90,24 @@ public struct PageFeature: Reducer {
         return .send(.loadPage(at: state.pageNumber))
       case .previousPage:
         return state.pageNumber > 2 ? .send(.loadPage(at: state.pageNumber - 2)) : .none
-      case .scrollAction(_): break
-      case .paragraphAction(_): break
+      case .scrollAction: break
+      case .paragraphAction: break
       }
       return .none
     }
     .forEach(\.paragraphs, action: /Action.paragraphAction) {
       ParagraphFeature()
     }
-//    ._printChanges()
+    
   }
-
-  //TODO: Make with Overture
-  private func clear(state: inout State) {
+//  
+//   let clear = concat(
+//    mut(\State.chapter, nil),
+//    mver(\.paragraphs) { $0.removeAll() }
+//  )
+  private func clear(_ state: inout State) {
     state.chapter = nil
     state.paragraphs.removeAll()
   }
-}
 
+}

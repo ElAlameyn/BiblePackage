@@ -43,6 +43,7 @@ let package = Package(
         "ParserClient",
         "Extensions+GenericViews",
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "Overture", package: "swift-overture"),
       ]),
     .target(name: "Extensions+GenericViews", dependencies: []),
     .testTarget(name: "BiblePackageTests", dependencies: ["BiblePackage"]),

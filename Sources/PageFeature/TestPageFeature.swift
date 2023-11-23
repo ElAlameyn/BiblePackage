@@ -37,10 +37,12 @@ struct TestPageFeature: Reducer {
         default:
           return .none
         }
+      case .nextPage:
+        return .send(.loadPage(at: state.pageNumber + 1))
       default:
         return .none
       }
     }
-    .dependency(\.parseClient, .testValue)
+//    .dependency(\.parseClient, .testValue)
   }
 }

@@ -14,7 +14,7 @@ public struct ScrollReducer: Reducer {
     var currentScrollValue: CGFloat = .zero
   }
   
-  public enum Action {
+  public enum Action: Hashable {
     case scrolling(CGFloat)
     case endScroll
   }
@@ -28,6 +28,7 @@ public struct ScrollReducer: Reducer {
     case .scrolling(let cgFloat):
       state.isScrolling = true
       state.currentScrollValue = cgFloat
+      print("Current scroll: \(cgFloat)")
       return .send(.endScroll).debounce(id: CancelID.scroll, for: 0.2, scheduler: mainQueue)
     case .endScroll:
       state.isScrolling = false
