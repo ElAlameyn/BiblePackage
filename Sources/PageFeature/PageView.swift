@@ -42,7 +42,7 @@ public struct PageView: View {
               }
               .id(1)
 
-            VStack(alignment: .leading, spacing: 20) {
+            LazyVStack(alignment: .leading, spacing: 20) {
               ForEachStore(
                 store.scope(state: \.paragraphs, action: PageFeature.Action.paragraphAction),
                 content: ParagraphView.init(store:)

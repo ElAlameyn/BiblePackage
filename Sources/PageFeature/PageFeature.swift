@@ -100,14 +100,10 @@ public struct PageFeature: Reducer {
     }
     
   }
-//  
-//   let clear = concat(
-//    mut(\State.chapter, nil),
-//    mver(\.paragraphs) { $0.removeAll() }
-//  )
-  private func clear(_ state: inout State) {
-    state.chapter = nil
-    state.paragraphs.removeAll()
-  }
+  
+   private let clear = concat(
+    mut(\State.chapter, nil),
+    mver(\.paragraphs) { $0.removeAll() }
+  )
 
 }
