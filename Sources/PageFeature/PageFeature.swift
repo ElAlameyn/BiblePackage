@@ -9,6 +9,8 @@ import ComposableArchitecture
 import Overture
 import ParserClient
 import PDFKit
+import SwiftUI
+
 
 public struct PageFeature: Reducer {
   public init() {}
@@ -20,6 +22,8 @@ public struct PageFeature: Reducer {
     var paragraphs = IdentifiedArrayOf<Paragraph>()
     var loadingState: LoadingPageState = .none
     var scrollState: ScrollReducer.State = .init()
+    var isSwipe = false
+    var edge: Edge = .leading
 
     public init() {}
   }
@@ -60,6 +64,7 @@ public struct PageFeature: Reducer {
       case .parsingResult(.success(let page)):
         switch page {
         case .start(let startPageInfo):
+          
           state.book = startPageInfo.bibleBookName
           state.chapter = startPageInfo.chapter
           state.paragraphs += startPageInfo.paragraphs

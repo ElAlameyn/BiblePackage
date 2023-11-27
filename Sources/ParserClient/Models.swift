@@ -8,7 +8,7 @@
 import Foundation
 
 public struct Book: Encodable, Hashable {
-  public let name: String
+  public var name: String
 }
 
 public struct Chapter: Encodable, Hashable, CustomStringConvertible {
@@ -16,7 +16,7 @@ public struct Chapter: Encodable, Hashable, CustomStringConvertible {
   public let number: Int
   
   public var description: String {
-    "\(name) \(number)"
+      "\(name) \(number)"
   }
 }
 

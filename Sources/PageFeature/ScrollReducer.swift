@@ -28,7 +28,7 @@ public struct ScrollReducer: Reducer {
     case .scrolling(let cgFloat):
       state.isScrolling = true
       state.currentScrollValue = cgFloat
-      print("Current scroll: \(cgFloat)")
+//      print("Current scroll: \(cgFloat)")
       return .send(.endScroll).debounce(id: CancelID.scroll, for: 0.2, scheduler: mainQueue)
     case .endScroll:
       state.isScrolling = false

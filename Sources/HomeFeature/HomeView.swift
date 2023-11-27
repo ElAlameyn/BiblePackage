@@ -41,7 +41,7 @@ public struct HomeView: View {
           VStack {
             NavigationLink {
 //              PageVC(pages: [
-//                PageView()
+//                EmptyView()
 //              ])
 //              .ignoresSafeArea()
             } label: {

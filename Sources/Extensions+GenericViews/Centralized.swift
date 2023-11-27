@@ -16,13 +16,8 @@ public struct Centralized<CenterView: View>: View {
 
   public var body: some View {
     VStack {
-      Spacer()
-      HStack {
-        Spacer()
         view()
-        Spacer()
-      }
-      Spacer()
     }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 }
