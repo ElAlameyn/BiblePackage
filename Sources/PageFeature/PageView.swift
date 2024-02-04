@@ -65,8 +65,8 @@ public struct PageView: View {
             .resizable()
             .interpolation(.medium)
             .aspectRatio(contentMode: .fill)
-//            .frame(width: proxy.width, height: proxy.height / 3, alignment: .top)
             .clipped(antialiased: true)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             .ignoresSafeArea(edges: .top)
             .overlay {
               WhiteOverlay(model: .init(
@@ -87,8 +87,10 @@ public struct PageView: View {
               }
             }
         }
-        .padding()
       }
+    }
+    .onLoad {
+        viewStore.send(.loadPage(at: 1))
     }
   }
 }

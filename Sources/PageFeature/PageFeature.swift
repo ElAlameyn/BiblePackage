@@ -25,7 +25,7 @@ public struct PageFeature: Reducer {
     var isSwipe = false
     var edge: Edge = .leading
     
-    public var id: Int { pageNumber }
+    public var id: UUID { UUID() }
 
     public init() {}
   }
@@ -66,7 +66,6 @@ public struct PageFeature: Reducer {
       case .parsingResult(.success(let page)):
         switch page {
         case .start(let startPageInfo):
-          
           state.book = startPageInfo.bibleBookName
           state.chapter = startPageInfo.chapter
           state.paragraphs += startPageInfo.paragraphs
@@ -92,6 +91,7 @@ public struct PageFeature: Reducer {
         }
       case .parsingResult(.failure(let error)):
         // TODO: Handle error
+          print(error)
         break
       case .nextPage:
         return .send(.loadPage(at: state.pageNumber))

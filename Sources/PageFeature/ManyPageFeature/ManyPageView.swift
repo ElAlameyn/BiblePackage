@@ -9,68 +9,73 @@ import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct ManyPagesFeature {
-  public init() {}
-  
-  @ObservableState
-  public struct State: Equatable {
-    var navState = [Status.previous, .current, .next]
-//    @BindingState var navSelection = Status.current
+public struct ManyPagesFeature {
+    public init() {}
     
-    var number = 0
-    var pages = IdentifiedArrayOf<PageFeature.State>()
+    @ObservableState
+    public struct State: Equatable {
+        var navState = [Status.previous, .current, .next]
+        var selection: Int = 0
+        
+        var number = 0
+        var pages = IdentifiedArrayOf<PageFeature.State>()
+        
+        public init(pages: IdentifiedArrayOf<PageFeature.State>) {
+            self.pages = pages
+        }
+    }
     
-    public init(pages: IdentifiedArrayOf<PageFeature.State>) {
-      self.pages = pages
+    public enum Action: Equatable, BindableAction {
+        case binding(BindingAction<State>)
+        case pageFeature(id: UUID, action: PageFeature.Action)
     }
-  }
-  
-  public enum Action: Equatable, BindableAction {
-    case binding(BindingAction<State>)
-    case pageFeature(id: Int, action: PageFeature.Action)
-  }
-  
-  public var body: some Reducer<State, Action> {
-    Reduce { _, _ in
-      .none
+    
+    public var body: some Reducer<State, Action> {
+        Reduce { _, _ in
+                .none
+        }
     }
-  }
 }
 
 public struct ManyPagesView: View {
-  let store: StoreOf<ManyPagesFeature>
-  
-  public var body: some View {
-    var number = 0
-    TabView(selection: .constant(Status.previous)) {
-      ForEachStore(store.scope(
-        state: \.pages,
-        action: \.pageFeature),
-      content: { store in
-        PageView(store: store)
-          .onLoad {
-            store.send(.loadPage(at: number))
-            number += 1
-          }
-      })
+    let store: StoreOf<ManyPagesFeature>
+    
+    public init(store: StoreOf<ManyPagesFeature>) {
+        self.store = store
     }
-    .tabViewStyle(.page(indexDisplayMode: .never))
-  }
+    
+    public var body: some View {
+        var number = 0
+        TabView(selection: Binding(get: { store.selection }, set: { store.selection = $0 } )) {
+            ForEachStore(store.scope(
+                state: \.pages,
+                action: \.pageFeature),
+                         content: { store in
+                PageView(store: store)
+                    .onLoad {
+                        store.send(.loadPage(at:number))
+                        number += 1
+                    }
+            })
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+    }
 }
 
 private var  pages = IdentifiedArray(uniqueElements: [
-  PageFeature.State(),
-  PageFeature.State(),
-  PageFeature.State(),
-  PageFeature.State(),
+    PageFeature.State(),
+    PageFeature.State(),
+    PageFeature.State(),
+    PageFeature.State(),
 ])
 
 #Preview {
-  return ManyPagesView(
-    store: .init(
-      initialState: .init(pages: pages),
-      reducer: {
-        ManyPagesFeature()
-      })
-  )
+    return ManyPagesView(
+        store: .init(
+            initialState: .init(pages: pages),
+            reducer: {
+                ManyPagesFeature()
+                    .dependency(\.parseClient, .liveValue)
+            })
+    )
 }

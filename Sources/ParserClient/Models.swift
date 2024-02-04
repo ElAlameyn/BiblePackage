@@ -8,7 +8,7 @@
 import Foundation
 
 public struct Book: Encodable, Hashable {
-  public var name: String
+  public let name: String
 }
 
 public struct Chapter: Encodable, Hashable, CustomStringConvertible {
