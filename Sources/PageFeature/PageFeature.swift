@@ -15,7 +15,7 @@ import SwiftUI
 public struct PageFeature: Reducer {
   public init() {}
 
-  public struct State: Equatable {
+  public struct State: Equatable, Identifiable {
     var pageNumber: Int = 0
     var chapter: Chapter?
     var book: Book?
@@ -24,6 +24,8 @@ public struct PageFeature: Reducer {
     var scrollState: ScrollReducer.State = .init()
     var isSwipe = false
     var edge: Edge = .leading
+    
+    public var id: Int { pageNumber }
 
     public init() {}
   }

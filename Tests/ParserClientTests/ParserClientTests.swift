@@ -37,14 +37,13 @@ final class ParserClientTests: XCTestCase {
 
     XCTAssert(
       try BookPageParser().parse(input) ==
-      (
-        Book(name: "Бытие"),
-        Chapter(name: "Глава", number: 1),
-        [
+      PageInfo(
+        bibleBookName:  Book(name: "Бытие"),
+        chapter: Chapter(name: "Глава", number: 1),
+        paragraphs: [
           Paragraph(number: 3, text: "И сказал Бог: да будет свет. И стал свет."),
           Paragraph(number: 7, text: "И создал Бог твердь, и отделил воду, которая под твердью, от воды, которая над твердью. И стало так."),
-        ]
-      )
+        ])
     )
   }
 }
